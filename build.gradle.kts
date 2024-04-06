@@ -29,7 +29,6 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("org.postgresql:postgresql:42.7.3")
     implementation("com.zaxxer:HikariCP:3.4.2")
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 

@@ -39,7 +39,7 @@ data class Product(
         if (!isExpired) {
             resString += "\n"
             resString += """
-            Годен до: ${this.startUsingDate.plusDays(shelfLifeDays).toLocalDate()} (дней: ${this.calcRemainDays()} )
+            Годен до: ${this.startUsingDate.plusDays(shelfLifeDays).toLocalDate()} (дней: ${this.calcRemainDays()})
             """.trimIndent()
         }
         resString += "\n-----------------\n"
