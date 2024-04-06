@@ -33,13 +33,13 @@ data class Product(
             Номер: ${this.id}
             Название: ${this.productName}
             Срок годности: ${this.shelfLifeDays} дней
-            Дата открытия: ${this.startUsingDate}
+            Дата открытия: ${this.startUsingDate.toLocalDate()}
             Статус: $productStatus
         """.trimIndent()
         if (!isExpired) {
             resString += "\n"
             resString += """
-            Годен до: ${this.startUsingDate.plusDays(shelfLifeDays)} (дней: ${this.calcRemainDays()} )
+            Годен до: ${this.startUsingDate.plusDays(shelfLifeDays).toLocalDate()} (дней: ${this.calcRemainDays()} )
             """.trimIndent()
         }
         resString += "\n-----------------\n"
