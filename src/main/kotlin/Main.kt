@@ -10,11 +10,11 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.requests.send.SendTextMessage
 import dev.inmo.tgbotapi.types.BotCommand
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Clock
 import org.coliver.enterprise.dao.dao
 import org.coliver.enterprise.databasse.ConnectionParams
 import org.coliver.enterprise.databasse.DatabaseFactory
 import org.coliver.enterprise.model.Product
-import java.time.LocalDateTime
 
 
 val TOKEN = "6950263144:AAFwyPILBFwomEAt84qOOiMHBMS00zOJv8k"
@@ -49,6 +49,7 @@ suspend fun main() {
             """.trimIndent()
             sendTextMessage(it.chat.id, text)
         }
+
         onCommand("add") {
             val name = waitText(
                 SendTextMessage(it.chat.id, "Напишите название продукта")
@@ -56,7 +57,7 @@ suspend fun main() {
             val shelfLifeDays = waitText(
                 SendTextMessage(it.chat.id, "Напишите сколько хранится продукт (в днях)")
             ).first()
-            val date = LocalDateTime.now()
+            val date = Clock.System.now()
             val product = Product(
                 chatId = it.chat.id.chatId.long,
                 productName = name.text,

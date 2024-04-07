@@ -29,6 +29,10 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("org.postgresql:postgresql:42.7.3")
     implementation("com.zaxxer:HikariCP:3.4.2")
+    implementation("org.jetbrains.exposed:exposed-core:0.49.0")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.49.0")
+    implementation("org.jetbrains.exposed:exposed-dao:0.49.0")
+    runtimeOnly("org.jetbrains.exposed:exposed-jdbc:0.49.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
