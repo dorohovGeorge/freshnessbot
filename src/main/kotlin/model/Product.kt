@@ -1,11 +1,9 @@
 package org.coliver.enterprise.model
 
-import korlibs.time.fromDays
 import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
-import kotlin.time.Duration
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 
 @NoArg
 @Serializable
@@ -13,19 +11,24 @@ data class Product(
     val id: Long? = null,
     val chatId: Long,
     val productName: String,
-    val startUsingDate: Instant,
+    val startUsingDate: LocalDateTime,
     val shelfLifeDays: Long
 ) {
     private val timezone = TimeZone.of("Europe/Moscow")
 
     private fun isExpired(): Boolean {
-        return Clock.System.now() > startUsingDate.plus(Duration.fromDays(shelfLifeDays))
+        return Clock.System.now()
+            .toLocalDateTime(timezone).date >
+            startUsingDate.date
+                .plus(DatePeriod(days = shelfLifeDays.toInt()))
     }
 
     private fun calcRemainDays(): Int {
+        val days = DateTimePeriod(days = shelfLifeDays.toInt())
+        val date = startUsingDate.toInstant(timezone).plus(days, timezone)
         return Clock.System.now()
             .daysUntil(
-                startUsingDate.plus(Duration.fromDays(shelfLifeDays)),
+                date,
                 timezone
             )
     }
@@ -40,7 +43,6 @@ data class Product(
             Срок годности: ${this.shelfLifeDays} дней
             Дата открытия: ${
             this.startUsingDate
-                .toLocalDateTime(timezone)
                 .date
         }
             Статус: $productStatus
@@ -49,10 +51,8 @@ data class Product(
             resString += "\n"
             resString += """
             Годен до: ${
-                this.startUsingDate
-                    .plus(Duration.fromDays(shelfLifeDays))
-                    .toLocalDateTime(timezone)
-                    .date
+                this.startUsingDate.date
+                    .plus(DatePeriod(days = shelfLifeDays.toInt()))
             } (осталось дней: ${this.calcRemainDays()})
             """.trimIndent()
         }
@@ -65,7 +65,7 @@ object Products : Table() {
     val id = long("id").autoIncrement().uniqueIndex()
     val chatId = long("chatId")
     val productName = varchar("name", 64)
-    val startUsingDate = timestamp("sentAt")
+    val startUsingDate = datetime("sentAt")
     val shelfLifeDays = long("shelfLifeDays")
 
     override val primaryKey = PrimaryKey(id)

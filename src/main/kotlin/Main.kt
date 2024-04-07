@@ -11,6 +11,8 @@ import dev.inmo.tgbotapi.requests.send.SendTextMessage
 import dev.inmo.tgbotapi.types.BotCommand
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.coliver.enterprise.dao.dao
 import org.coliver.enterprise.databasse.ConnectionParams
 import org.coliver.enterprise.databasse.DatabaseFactory
@@ -57,7 +59,7 @@ suspend fun main() {
             val shelfLifeDays = waitText(
                 SendTextMessage(it.chat.id, "Напишите сколько хранится продукт (в днях)")
             ).first()
-            val date = Clock.System.now()
+            val date = Clock.System.now().toLocalDateTime(timeZone = TimeZone.of("Europe/Moscow"))
             val product = Product(
                 chatId = it.chat.id.chatId.long,
                 productName = name.text,
@@ -82,7 +84,7 @@ suspend fun main() {
         }
         onCommand("all") {
             val allProducts = dao.allProductsByChatId(it.chat.id.chatId.long)
-            if(allProducts.isEmpty()) {
+            if (allProducts.isEmpty()) {
                 sendTextMessage(it.chat.id, "Продуктов нет")
             } else {
                 sendTextMessage(it.chat.id, allProducts.print())
