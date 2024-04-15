@@ -1,5 +1,6 @@
 package org.coliver.enterprise.dao
 
+import dev.inmo.tgbotapi.types.message.MessageOrigin
 import kotlinx.coroutines.runBlocking
 import org.coliver.enterprise.databasse.DatabaseFactory.dbQuery
 import org.coliver.enterprise.model.Product
@@ -17,6 +18,10 @@ class DAOFacadeImpl : DAOFacade {
         shelfLifeDays = row[Products.shelfLifeDays]
     )
 
+    private fun resultRowToId(row: ResultRow): Long {
+        return row[Products.chatId]
+    }
+
     override suspend fun allProducts(): List<Product> = dbQuery {
         transaction {
             Products.selectAll().map(::resultRowToProduct)
@@ -27,6 +32,12 @@ class DAOFacadeImpl : DAOFacade {
         transaction {
             Products.select(Products.chatId eq chatId)
                 .map(::resultRowToProduct)
+        }
+    }
+
+    override suspend fun getAllChatId(): List<Long> = dbQuery {
+        transaction {
+            Products.select(Products.chatId).withDistinct().map(::resultRowToId)
         }
     }
 
@@ -50,7 +61,7 @@ class DAOFacadeImpl : DAOFacade {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteProduct(chatId: Long, id: Long, ): Boolean = dbQuery {
+    override suspend fun deleteProduct(chatId: Long, id: Long): Boolean = dbQuery {
         transaction {
             Products.deleteWhere { (Products.chatId eq chatId) and (Products.id eq id) } > 0
         }

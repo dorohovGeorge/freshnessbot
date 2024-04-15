@@ -23,7 +23,7 @@ data class Product(
                 .plus(DatePeriod(days = shelfLifeDays.toInt()))
     }
 
-    private fun calcRemainDays(): Int {
+    fun calcRemainDays(): Int {
         val days = DateTimePeriod(days = shelfLifeDays.toInt())
         val date = startUsingDate.toInstant(timezone).plus(days, timezone)
         return Clock.System.now()

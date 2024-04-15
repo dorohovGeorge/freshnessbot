@@ -9,7 +9,13 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitText
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.requests.send.SendTextMessage
 import dev.inmo.tgbotapi.types.BotCommand
+import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.RawChatId
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -17,6 +23,9 @@ import org.coliver.enterprise.dao.dao
 import org.coliver.enterprise.databasse.ConnectionParams
 import org.coliver.enterprise.databasse.DatabaseFactory
 import org.coliver.enterprise.model.Product
+import org.coliver.enterprise.util.checkFreshness
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 val TOKEN = "6950263144:AAFwyPILBFwomEAt84qOOiMHBMS00zOJv8k"
@@ -27,6 +36,7 @@ val databaseParams = ConnectionParams(
     user = "postgres",
     password = "402012Ehodas"
 )
+
 
 suspend fun main() {
     DatabaseFactory.init(databaseParams)
@@ -41,6 +51,19 @@ suspend fun main() {
     )
     bot.buildBehaviourWithLongPolling {
         println(getMe())
+        Timer().schedule(100, 60 * 60 * 20) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val allUsers = async { dao.getAllChatId() }.await()
+                allUsers.forEach { userChatId ->
+                    val chatId = ChatId(RawChatId(userChatId))
+                    val allProducts = async { dao.allProductsByChatId(userChatId) }
+                    val expiredProducts = allProducts.await().checkFreshness()
+                    if (expiredProducts.isNotEmpty()) {
+                        sendTextMessage(chatId, expiredProducts.print())
+                    }
+                }
+            }
+        }
         onCommand("start") {
             val text = """
                 Всем привет! Этот бот создан для контроля за свежестью продуктов в вашем холодильнике
@@ -50,6 +73,7 @@ suspend fun main() {
                 3) /all - посмотреть список продуктов текущих
             """.trimIndent()
             sendTextMessage(it.chat.id, text)
+            sendTextMessage(it.chat.id, "AAA")
         }
 
         onCommand("add") {
