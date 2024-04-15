@@ -51,13 +51,13 @@ suspend fun main() {
     )
     bot.buildBehaviourWithLongPolling {
         println(getMe())
-        Timer().schedule(100, 60 * 60 * 20) {
+        Timer().schedule(0, 60 * 60 * 12000) {
             CoroutineScope(Dispatchers.IO).launch {
                 val allUsers = async { dao.getAllChatId() }.await()
                 allUsers.forEach { userChatId ->
                     val chatId = ChatId(RawChatId(userChatId))
-                    val allProducts = async { dao.allProductsByChatId(userChatId) }
-                    val expiredProducts = allProducts.await().checkFreshness()
+                    val allProducts = async { dao.allProductsByChatId(userChatId) }.await()
+                    val expiredProducts = allProducts.checkFreshness()
                     if (expiredProducts.isNotEmpty()) {
                         sendTextMessage(chatId, expiredProducts.print())
                     }

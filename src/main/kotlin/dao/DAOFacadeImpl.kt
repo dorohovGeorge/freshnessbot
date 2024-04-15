@@ -30,7 +30,7 @@ class DAOFacadeImpl : DAOFacade {
 
     override suspend fun allProductsByChatId(chatId: Long): List<Product> = dbQuery {
         transaction {
-            Products.select(Products.chatId eq chatId)
+            Products.selectAll().where(Products.chatId eq chatId)
                 .map(::resultRowToProduct)
         }
     }
