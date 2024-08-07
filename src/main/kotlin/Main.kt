@@ -32,9 +32,9 @@ val TOKEN = "6950263144:AAFwyPILBFwomEAt84qOOiMHBMS00zOJv8k"
 
 val products = mutableListOf<Product>()
 val databaseParams = ConnectionParams(
-    url = "jdbc:postgresql://193.149.190.120:5432/tgbot",
+    url = "jdbc:postgresql://94.103.89.23:5432/tgbot",
     user = "postgres",
-    password = "402012Ehodas"
+    password = "4fFzG5313GCQnLCr"
 )
 
 
